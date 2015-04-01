@@ -11,14 +11,15 @@ module.exports = function (lines) {
         '.intel_syntax noprefix',
         globl(name),
         label(name)
-    ].concat(_.map(_.rest(lines), substitute))
+    ].concat(_.map(_.rest(lines), substituteParameters))
 
-    function substitute(line) {
-        _.forEach(parameters(declaration[2]), function (parameter, i) {
-            line = line.replace(new RegExp(parameter, 'g'), 'xmm' + i)
-        })
+    function substituteParameters(line) {
+        return _.reduce(parameters(declaration[2]), substituteParameter, line)
 
-        return line
+    }
+
+    function substituteParameter(s, p, i) {
+        return s.replace(new RegExp(p, 'g'), 'xmm' + i)
     }
 }
 
