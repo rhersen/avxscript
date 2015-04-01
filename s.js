@@ -4,8 +4,11 @@ var globl = _.template('.globl _${ name }');
 var label = _.template('_${ name }:');
 
 module.exports = function (lines) {
-    var declaration = /double (\w+)\(double (\w+)\)/.exec(_.first(lines));
+    var declaration = /double (\w+)\((.*)\)/.exec(_.first(lines));
+    var parameterList = declaration[2];
+    var parameterListMatch = /double (\w+)/.exec(parameterList);
     var options = {name: declaration[1]};
+    var firstParameter = parameterListMatch && parameterListMatch[1];
 
     return [
         '.intel_syntax noprefix',
@@ -14,6 +17,10 @@ module.exports = function (lines) {
     ].concat(_.map(_.rest(lines), substitute))
 
     function substitute(line) {
-        return line.replace(new RegExp(declaration[2], 'g'), 'xmm0')
+        if (firstParameter) {
+            return line.replace(new RegExp(firstParameter, 'g'), 'xmm0')
+        } else {
+            return line
+        }
     }
 }

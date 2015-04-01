@@ -34,4 +34,19 @@ describe('s', function () {
             ])
         )
     })
+
+    it('handles empty parameter list', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'ret'
+            ],
+            s([
+                'double f()',
+                'ret'
+            ])
+        )
+    })
 })
