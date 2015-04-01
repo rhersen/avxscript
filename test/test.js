@@ -35,6 +35,23 @@ describe('s', function () {
         )
     })
 
+    it('substitutes more than one named parameter', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'sqrtsd xmm0, xmm1',
+                'ret'
+            ],
+            s([
+                'double f(double x, double y)',
+                'sqrtsd x, y',
+                'ret'
+            ])
+        )
+    })
+
     it('handles empty parameter list', function () {
         assert.deepEqual(
             [
