@@ -29,7 +29,7 @@ describe('s', function () {
             ],
             s([
                 'double f(double y)',
-                'sqrtsd y,, y',
+                'sqrtsd y, y',
                 'ret'
             ])
         )
