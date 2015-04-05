@@ -52,6 +52,40 @@ describe('s', function () {
         )
     })
 
+    it('transforms assignment syntax to three-parameter instruction', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'vdivsd xmm0, xmm1, xmm2',
+                'ret'
+            ],
+            s([
+                'double f(double q, double x, double y)',
+                'q = vdivsd(x, y)',
+                'ret'
+            ])
+        )
+    })
+
+    it('is not too whitespace-sensitive', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'vdivsd xmm0, xmm1, xmm2',
+                'ret'
+            ],
+            s([
+                'double f(double q, double x, double y)',
+                'q  =vdivsd(x,y)',
+                'ret'
+            ])
+        )
+    })
+
     it('substitutes named parameter that is prefix of another', function () {
         assert.deepEqual(
             [
