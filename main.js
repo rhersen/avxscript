@@ -1,6 +1,7 @@
 var fs = require('fs')
 var s = require('./s')
 var pathToFile = process.argv[2]
+var outFile = pathToFile.substr(0, pathToFile.length - 2)
 
 var bufferString, bufferStringSplit
 
@@ -10,6 +11,5 @@ function readFile() {
 }
 
 bufferStringSplit = s(readFile())
-bufferStringSplit.forEach(function (line) {
-    console.log(line)
-})
+
+fs.writeFileSync(outFile, bufferStringSplit.join('\n'))
