@@ -52,6 +52,23 @@ describe('s', function () {
         )
     })
 
+    it('substitutes named parameter that is prefix of another', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'sqrtsd xmm0, xmm1',
+                'ret'
+            ],
+            s([
+                'double f(double x, double xa)',
+                'sqrtsd x, xa',
+                'ret'
+            ])
+        )
+    })
+
     it('handles empty parameter list', function () {
         assert.deepEqual(
             [

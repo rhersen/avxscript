@@ -19,7 +19,7 @@ module.exports = function (lines) {
     }
 
     function substituteParameter(s, p, i) {
-        return s.replace(new RegExp(p, 'g'), 'xmm' + i)
+        return s.replace(new RegExp('\\b' + p + '\\b', 'g'), 'xmm' + i)
     }
 }
 
