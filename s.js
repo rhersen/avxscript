@@ -17,7 +17,12 @@ module.exports = function (lines) {
     ].concat(_.map(_.rest(lines), substituteParameters))
 
     function substituteParameters(line) {
-        var match = /\s*(\w+)\s*=\s*(\w+)[(\s]*(\w+),\s*(\w+)/.exec(line)
+        var match
+        match = /\s*(\w+)\s*=/.exec(line)
+        if (match && !_.contains(parameters, match[1])) {
+            parameters.push(match[1])
+        }
+        match = /\s*(\w+)\s*=\s*(\w+)[(\s]*(\w+),\s*(\w+)/.exec(line)
         if (match) {
             line = threeArgs({
                 destination: match[1],

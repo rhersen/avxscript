@@ -120,6 +120,44 @@ describe('s', function () {
         )
     })
 
+    it('regards undeclared variable as local variable', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'movsd xmm1, xmm0',
+                'ret'
+            ],
+            s([
+                'double f(double x)',
+                'xa = x',
+                'ret'
+            ])
+        )
+    })
+
+    it('only declares a local variable once', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'movsd xmm1, xmm0',
+                'movsd xmm1, xmm0',
+                'movsd xmm2, xmm0',
+                'ret'
+            ],
+            s([
+                'double f(double x)',
+                'a = x',
+                'a = x',
+                'b = x',
+                'ret'
+            ])
+        )
+    })
+
     it('handles empty parameter list', function () {
         assert.deepEqual(
             [
