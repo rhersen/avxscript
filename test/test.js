@@ -103,6 +103,23 @@ describe('s', function () {
         )
     })
 
+    it('transforms minus-assignment to subsd instruction', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'subsd xmm0, xmm1',
+                'ret'
+            ],
+            s([
+                'double f(double q, double x)',
+                'q -= x',
+                'ret'
+            ])
+        )
+    })
+
     it('is not too whitespace-sensitive', function () {
         assert.deepEqual(
             [

@@ -4,7 +4,6 @@ var globl = _.template('.globl _${ name }')
 var label = _.template('_${ name }:')
 var threeArgs = _.template('${ instruction } ${ destination }, ${ source1 }, ${ source2 }')
 var assign = _.template('${ instruction } ${ destination }, ${ source }')
-var addsd = _.template('addsd ${ destination }, ${ source }')
 
 module.exports = function (lines) {
     var declaration = /double (\w+)\((.*)\)/.exec(_.first(lines))
@@ -34,7 +33,16 @@ module.exports = function (lines) {
         }
         match = /\s*(\w+)\s*\+=\s*(\w+)/.exec(line)
         if (match) {
-            line = addsd({
+            line = assign({
+                instruction: 'addsd',
+                destination: match[1],
+                source: match[2]
+            })
+        }
+        match = /\s*(\w+)\s*-=\s*(\w+)/.exec(line)
+        if (match) {
+            line = assign({
+                instruction: 'subsd',
                 destination: match[1],
                 source: match[2]
             })
