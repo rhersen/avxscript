@@ -1,15 +1,10 @@
+var _ = require("lodash")
 var assert = require("assert")
 var s = require("../s")
 describe('s', function () {
     it('prepends intel_syntax and globl and substitutes xmm0', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'sqrtsd xmm0, xmm0',
-                'ret'
-            ],
+            assembler('sqrtsd xmm0, xmm0'),
             s([
                 'double f(double x)',
                 'sqrtsd x, x',
@@ -20,13 +15,7 @@ describe('s', function () {
 
     it('substitutes named parameter', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'sqrtsd xmm0, xmm0',
-                'ret'
-            ],
+            assembler('sqrtsd xmm0, xmm0'),
             s([
                 'double f(double y)',
                 'sqrtsd y, y',
@@ -37,13 +26,7 @@ describe('s', function () {
 
     it('substitutes more than one named parameter', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'sqrtsd xmm0, xmm1',
-                'ret'
-            ],
+            assembler('sqrtsd xmm0, xmm1'),
             s([
                 'double f(double x, double y)',
                 'sqrtsd x, y',
@@ -54,13 +37,7 @@ describe('s', function () {
 
     it('transforms assignment syntax to three-parameter instruction', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'vdivsd xmm0, xmm1, xmm2',
-                'ret'
-            ],
+            assembler('vdivsd xmm0, xmm1, xmm2'),
             s([
                 'double f(double q, double x, double y)',
                 'q = vdivsd(x, y)',
@@ -71,13 +48,7 @@ describe('s', function () {
 
     it('transforms simple assignment to mov instruction', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'movsd xmm0, xmm1',
-                'ret'
-            ],
+            assembler('movsd xmm0, xmm1'),
             s([
                 'double f(double q, double x)',
                 'q = x',
@@ -88,13 +59,7 @@ describe('s', function () {
 
     it('transforms plus-assignment to addsd instruction', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'addsd xmm0, xmm1',
-                'ret'
-            ],
+            assembler('addsd xmm0, xmm1'),
             s([
                 'double f(double q, double x)',
                 'q += x',
@@ -105,13 +70,7 @@ describe('s', function () {
 
     it('transforms minus-assignment to subsd instruction', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'subsd xmm0, xmm1',
-                'ret'
-            ],
+            assembler('subsd xmm0, xmm1'),
             s([
                 'double f(double q, double x)',
                 'q -= x',
@@ -122,13 +81,7 @@ describe('s', function () {
 
     it('is not too whitespace-sensitive', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'vdivsd xmm0, xmm1, xmm2',
-                'ret'
-            ],
+            assembler('vdivsd xmm0, xmm1, xmm2'),
             s([
                 'double f(double q, double x, double y)',
                 'q  =vdivsd(x,y)',
@@ -139,13 +92,7 @@ describe('s', function () {
 
     it('substitutes named parameter that is prefix of another', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'sqrtsd xmm0, xmm1',
-                'ret'
-            ],
+            assembler('sqrtsd xmm0, xmm1'),
             s([
                 'double f(double x, double xa)',
                 'sqrtsd x, xa',
@@ -156,13 +103,7 @@ describe('s', function () {
 
     it('regards undeclared variable as local variable', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'movsd xmm1, xmm0',
-                'ret'
-            ],
+            assembler('movsd xmm1, xmm0'),
             s([
                 'double f(double x)',
                 'xa = x',
@@ -173,15 +114,11 @@ describe('s', function () {
 
     it('only declares a local variable once', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
+            assembler(
                 'movsd xmm1, xmm0',
                 'movsd xmm1, xmm0',
-                'movsd xmm2, xmm0',
-                'ret'
-            ],
+                'movsd xmm2, xmm0'
+            ),
             s([
                 'double f(double x)',
                 'a = x',
@@ -194,16 +131,15 @@ describe('s', function () {
 
     it('handles empty parameter list', function () {
         assert.deepEqual(
-            [
-                '.intel_syntax noprefix',
-                '.globl _f',
-                '_f:',
-                'ret'
-            ],
+            assembler(),
             s([
                 'double f()',
                 'ret'
             ])
         )
     })
+
+    function assembler() {
+        return ['.intel_syntax noprefix', '.globl _f', '_f:'].concat(_.toArray(arguments), 'ret')
+    }
 })
