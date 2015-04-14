@@ -86,6 +86,23 @@ describe('s', function () {
         )
     })
 
+    it('transforms plus-assignment to addsd instruction', function () {
+        assert.deepEqual(
+            [
+                '.intel_syntax noprefix',
+                '.globl _f',
+                '_f:',
+                'addsd xmm0, xmm1',
+                'ret'
+            ],
+            s([
+                'double f(double q, double x)',
+                'q += x',
+                'ret'
+            ])
+        )
+    })
+
     it('is not too whitespace-sensitive', function () {
         assert.deepEqual(
             [
