@@ -50,8 +50,8 @@ describe('s', function () {
         assert.deepEqual(
             assembler('movsd xmm0, xmm1'),
             s([
-                'double f(double q, double x)',
-                'q = x',
+                'double f(double target, double source)',
+                'target = source',
                 'ret'
             ])
         )
@@ -74,6 +74,39 @@ describe('s', function () {
             s([
                 'double f(double q, double x)',
                 'q -= x',
+                'ret'
+            ])
+        )
+    })
+
+    it('transforms minus to vsubsd instruction', function () {
+        assert.deepEqual(
+            assembler('vsubsd xmm0, xmm1, xmm2'),
+            s([
+                'double f(double q, double x, double y)',
+                'q = x - y',
+                'ret'
+            ])
+        )
+    })
+
+    it('does not transform partial line', function () {
+        assert.deepEqual(
+            assembler('xmm0 = xmm1 - xmm2)'),
+            s([
+                'double f(double q, double x, double y)',
+                'q = x - y)',
+                'ret'
+            ])
+        )
+    })
+
+    it('does not transform unrecognized operator', function () {
+        assert.deepEqual(
+            assembler('xmm0 = xmm1 ! xmm2'),
+            s([
+                'double f(double q, double x, double y)',
+                'q = x ! y',
                 'ret'
             ])
         )

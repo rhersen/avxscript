@@ -7,22 +7,33 @@ var assign = _.template('${ instruction } ${ destination }, ${ source }')
 
 module.exports = function (lines) {
     var declaration = /double (\w+)\((.*)\)/.exec(_.first(lines))
+    var binaryFunction = /\s*(\w+)\s*=\s*(\w+)[(\s]*(\w+),\s*(\w+)[)\s]*$/;
+    var binaryOperator = /\s*(\w+)\s*=\s*(\w+)\s*(\W)\s*(\w+)$/;
+    var compoundAssignment = /\s*(\w+)\s*(\S)=\s*(\w+)$/;
+    var mov = /\s*(\w+)\s*=\s*(\w+)$/;
+
     var name = {name: declaration[1]}
     var parameters = params(declaration[2])
-
+    var instruction = {
+        '+': 'addsd',
+        '-': 'subsd',
+        '~': 'mulsd',
+        '÷': 'divsd',
+        '∧': 'andpd',
+        '∨': 'orpd'
+    }
     return [
         '.intel_syntax noprefix',
         globl(name),
         label(name)
     ].concat(_.map(_.rest(lines), substituteParameters))
-
     function substituteParameters(line) {
         var match
         match = /\s*(\w+)\s*=/.exec(line)
         if (match && !_.contains(parameters, match[1])) {
             parameters.push(match[1])
         }
-        match = /\s*(\w+)\s*=\s*(\w+)[(\s]*(\w+),\s*(\w+)/.exec(line)
+        match = binaryFunction.exec(line)
         if (match) {
             line = threeArgs({
                 destination: match[1],
@@ -31,23 +42,24 @@ module.exports = function (lines) {
                 source2: match[4]
             })
         }
-        match = /\s*(\w+)\s*\+=\s*(\w+)/.exec(line)
-        if (match) {
-            line = assign({
-                instruction: 'addsd',
+        match = binaryOperator.exec(line)
+        if (match && instruction[match[3]]) {
+            line = threeArgs({
                 destination: match[1],
-                source: match[2]
+                source1: match[2],
+                instruction: 'v' + instruction[match[3]],
+                source2: match[4]
             })
         }
-        match = /\s*(\w+)\s*-=\s*(\w+)/.exec(line)
-        if (match) {
+        match = compoundAssignment.exec(line)
+        if (match && instruction[match[2]]) {
             line = assign({
-                instruction: 'subsd',
+                instruction: instruction[match[2]],
                 destination: match[1],
-                source: match[2]
+                source: match[3]
             })
         }
-        match = /\s*(\w+)\s*=\s*(\w+)/.exec(line)
+        match = mov.exec(line)
         if (match) {
             line = assign({
                 instruction: 'movsd',
