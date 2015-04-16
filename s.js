@@ -20,7 +20,13 @@ module.exports = function (lines) {
         '×': 'mulsd',
         '÷': 'divsd',
         '∧': 'andpd',
-        '∨': 'orpd'
+        '∨': 'orpd',
+        '≡': 'cmpeqsd',
+        '<': 'cmpltsd',
+        '≤': 'cmplesd',
+        '≠': 'cmpneqsd',
+        '≥': 'cmpnltsd',
+        '>': 'cmpnlesd'
     }
     return [
         '.intel_syntax noprefix',
