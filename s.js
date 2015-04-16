@@ -17,7 +17,7 @@ module.exports = function (lines) {
     var instruction = {
         '+': 'addsd',
         '-': 'subsd',
-        '~': 'mulsd',
+        '×': 'mulsd',
         '÷': 'divsd',
         '∧': 'andpd',
         '∨': 'orpd'
