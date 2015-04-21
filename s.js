@@ -11,6 +11,7 @@ module.exports = function (lines) {
     var binaryOperator = /\s*(\w+)\s*=\s*(\w+)\s*(\W)\s*(\w+)$/;
     var compoundAssignment = /\s*(\w+)\s*(\S)=\s*(\w+)$/;
     var mov = /\s*(\w+)\s*=\s*(\w+)$/;
+    var returnValue = /\s*return\s+(\w+)\s*$/;
 
     var name = {name: declaration[1]}
     var parameters = params(declaration[2])
@@ -28,12 +29,20 @@ module.exports = function (lines) {
         '≥': 'cmpnltsd',
         '>': 'cmpnlesd'
     }
+
     return [
         '.intel_syntax noprefix',
         globl(name),
         label(name)
-    ].concat(_.map(_.rest(lines), substituteParameters))
-    function substituteParameters(line) {
+    ].concat(
+        _(lines)
+            .rest()
+            .map(substituteOperators)
+            .flatten()
+            .map(substituteParameters)
+            .value())
+
+    function substituteOperators(line) {
         var match
         match = /\s*(\w+)\s*=/.exec(line)
         if (match && !_.contains(parameters, match[1])) {
@@ -73,6 +82,20 @@ module.exports = function (lines) {
                 source: match[2]
             })
         }
+        match = returnValue.exec(line)
+        if (match) {
+            line = [
+                assign({
+                    instruction: 'movsd',
+                    destination: 'xmm0',
+                    source: match[1]
+                }),
+                'ret']
+        }
+        return line;
+    }
+
+    function substituteParameters(line) {
         return _.reduce(parameters, substituteParameter, line)
     }
 

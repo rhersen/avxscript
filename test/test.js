@@ -79,6 +79,20 @@ describe('s', function () {
         )
     })
 
+    it('transforms return to mov xmm0 followed by ret', function () {
+        assert.deepEqual(
+            assembler(
+                'vsubsd xmm2, xmm0, xmm1',
+                'movsd xmm0, xmm2'
+            ),
+            s([
+                'double f(double q, double x)',
+                'y = q - x',
+                'return y'
+            ])
+        )
+    })
+
     it('transforms minus to vsubsd instruction', function () {
         assert.deepEqual(
             assembler('vsubsd xmm0, xmm1, xmm2'),
