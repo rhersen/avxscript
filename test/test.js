@@ -97,8 +97,8 @@ describe('s', function () {
         assert.deepEqual(
             assembler('vsubsd xmm0, xmm1, xmm2'),
             s([
-                'double f(double q, double x, double y)',
-                'q = x - y',
+                'double f(double diff, double x, double y)',
+                'diff = x - y',
                 'ret'
             ])
         )
@@ -110,6 +110,17 @@ describe('s', function () {
             s([
                 'double f(double q, double x, double y)',
                 'q = x - y)',
+                'ret'
+            ])
+        )
+    })
+
+    it('does not remove leading label', function () {
+        assert.deepEqual(
+            assembler('loop: vsubsd xmm0, xmm1, xmm2'),
+            s([
+                'double f(double q, double x, double y)',
+                'loop: q = x - y',
                 'ret'
             ])
         )
