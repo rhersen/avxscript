@@ -2,11 +2,13 @@ var _ = require('lodash')
 
 var globl = _.template('.globl _${ name }')
 var label = _.template('_${ name }:')
+var jumpTo = _.template('${ instruction } ${ label }')
 var threeArgs = _.template('${ label }${ instruction } ${ destination }, ${ source1 }, ${ source2 }')
 var assign = _.template('${ label }${ instruction } ${ destination }, ${ source }')
 
 module.exports = function (lines) {
     var declaration = /double (\w+)\((.*)\)/.exec(_.first(lines))
+    var conditionalJump = /(.*[^\w]|)(\w+)\s*(\W)\s*(\w+)\s*(\?)\s*(\w+)$/;
     var binaryFunction = /(.*[^\w]|)(\w+)\s*=\s*(\w+)[(\s]*(\w+),\s*(\w+)[)\s]*$/;
     var binaryOperator = /(.*[^\w]|)(\w+)\s*=\s*(\w+)\s*(\W)\s*(\w+)$/;
     var compoundAssignment = /(.*[^\w]|)(\w+)\s*(\S)=\s*(\w+)$/;
@@ -28,6 +30,15 @@ module.exports = function (lines) {
         '≠': 'cmpneqsd',
         '≥': 'cmpnltsd',
         '>': 'cmpnlesd'
+    }
+
+    var jump = {
+        '≡': 'je',
+        '<': 'jb',
+        '≤': 'jle',
+        '≠': 'jne',
+        '≥': 'jae',
+        '>': 'ja'
     }
 
     return [
@@ -57,6 +68,20 @@ module.exports = function (lines) {
                 source1: match[4],
                 source2: match[5]
             })
+        }
+        match = conditionalJump.exec(line)
+        if (match) {
+            line = [
+                assign({
+                    label: match[1],
+                    instruction: 'comisd',
+                    destination: match[2],
+                    source: match[4]
+                }),
+                jumpTo({
+                    instruction: jump[match[3]],
+                    label: match[6]
+                })]
         }
         match = binaryOperator.exec(line)
         if (match && instruction[match[4]]) {

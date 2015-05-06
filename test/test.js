@@ -93,6 +93,25 @@ describe('s', function () {
         )
     })
 
+    it('transforms conditional jump to comisd followed by j', function () {
+        assert.deepEqual(
+            assembler(
+                'comisd xmm0, xmm1',
+                'ja skip',
+                'addsd xmm1, 1',
+                'skip:',
+                'movsd xmm0, xmm1'
+            ),
+            s([
+                'double f(double q, double x)',
+                'q > x ? skip',
+                'x += 1',
+                'skip:',
+                'return x'
+            ])
+        )
+    })
+
     it('transforms minus to vsubsd instruction', function () {
         assert.deepEqual(
             assembler('vsubsd xmm0, xmm1, xmm2'),
