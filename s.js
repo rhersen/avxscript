@@ -24,6 +24,8 @@ module.exports = function (lines) {
         '÷': 'divsd',
         '∧': 'andpd',
         '∨': 'orpd',
+        '⇂': 'minsd',
+        '↾': 'maxsd',
         '≡': 'cmpeqsd',
         '<': 'cmpltsd',
         '≤': 'cmplesd',
