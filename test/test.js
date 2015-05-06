@@ -97,14 +97,14 @@ describe('s', function () {
         assert.deepEqual(
             assembler(
                 'comisd xmm0, xmm1',
-                'ja skip',
+                'jbe skip',
                 'addsd xmm1, 1',
                 'skip:',
                 'movsd xmm0, xmm1'
             ),
             s([
                 'double f(double q, double x)',
-                'q > x ? skip',
+                'q ≤ x ? skip',
                 'x += 1',
                 'skip:',
                 'return x'

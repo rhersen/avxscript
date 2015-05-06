@@ -34,11 +34,11 @@ module.exports = function (lines) {
 
     var jump = {
         '≡': 'je',
-        '<': 'jb',
-        '≤': 'jle',
         '≠': 'jne',
-        '≥': 'jae',
-        '>': 'ja'
+        '<': 'jb',
+        '≤': 'jbe',
+        '>': 'ja',
+        '≥': 'jae'
     }
 
     return [
